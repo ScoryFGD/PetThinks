@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PetThinks - Plataforma de Salud y Educación Animal</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <header>
+    <div class="logo">
+      <img src="assets/img/logo.png" alt="Logo PetThinks" class="logo-img" onerror="this.src='https://via.placeholder.com/40?text=PT'">
+      <span>PetThinks</span>
+    </div>
+
+    <button id="themeToggle" class="btn-theme-toggle" onclick="toggleDarkMode()" title="Cambiar tema">
+      🌙 <span class="theme-text">Oscuro</span>
+    </button>
+
+    <div class="search-bar">
+      <input type="text" placeholder="Buscar síntomas, vacunación, alimentos..." id="globalSearch" onkeyup="searchCards()">
+      <button onclick="switchView('healthView')">Buscar</button>
+    </div>
+  </header>
+
+  <nav>
+    <button class="nav-btn active" onclick="switchView('healthView', this)">Consulta de Salud</button>
+    <button class="nav-btn" onclick="switchView('gameView', this)">Minijuego Educativo</button>
+    <button class="nav-btn" id="accountNavBtn" onclick="switchView('accountView', this)">Mi Cuenta / Iniciar Sesión</button>
+  </nav>
+
+  <main>
+    <section id="healthView" class="view active">
+      <h2>Catálogo de Salud y Fichas Informativas</h2>
+      <p style="margin-bottom: 1rem; color: #718096;">Filtra por tipo de mascota</p>
+      
+      <div class="filter-group">
+        <button class="btn-filter active" onclick="filterSpecies('all', this)">Todos</button>
+        <button class="btn-filter" onclick="filterSpecies('perro', this)">🐶 Perros</button>
+        <button class="btn-filter" onclick="filterSpecies('gato', this)">🐱 Gatos</button>
+      </div>
+
+      <div class="grid-cards" id="cardsGrid"></div>
+    </section>
+
+    <section id="gameView" class="view">
+      <div class="game-box">
+        <h2>🎮 Minijuego: Tenencia Responsable</h2>
+        <p>Aprende jugando cómo cuidar a tu mascota de manera adecuada.</p>
+        <hr style="margin: 1rem 0; border: none; border-top: 1px solid #e2e8f0;">
+        
+        <div id="quizContainer">
+          <p id="quizQuestion" style="font-size: 1.1rem; font-weight: bold; margin-bottom: 1rem;"></p>
+          <div class="game-options" id="quizOptions"></div>
+        </div>
+
+        <button class="btn-filter active" style="margin-top: 1.5rem;" onclick="loadRandomQuestion()">Siguiente Pregunta ➔</button>
+      </div>
+    </section>
+
+    <section id="accountView" class="view">
+      
+      <div id="loginBox" class="form-box">
+        <h2 style="text-align: center; color: var(--primary); margin-bottom: 1rem;">Iniciar Sesión</h2>
+        <form onsubmit="handleLogin(event)">
+          <div class="form-group">
+            <label for="loginEmail">Correo Electrónico:</label>
+            <input type="email" id="loginEmail" required placeholder="usuario@ejemplo.com">
+          </div>
+          <div class="form-group">
+            <label for="loginPassword">Contraseña:</label>
+            <input type="password" id="loginPassword" required placeholder="••••••••">
+          </div>
+          <button type="submit" class="btn-filter active" style="width: 100%; padding: 0.8rem; font-size: 1rem; margin-bottom: 1rem;">Entrar</button>
+        </form>
+        <p style="text-align: center; font-size: 0.85rem; color: #718096;">
+          ¿No tienes una cuenta? <a href="#" onclick="showAccountSubView('register')" style="color: var(--primary); font-weight: bold;">Regístrate aquí</a>
+        </p>
+      </div>
+
+      <div id="registerBox" class="form-box" style="display: none;">
+        <h2 style="text-align: center; color: var(--primary); margin-bottom: 1rem;">Crear Cuenta</h2>
+        <form onsubmit="handleRegister(event)">
+          <div class="form-group">
+            <label for="regName">Nombre Completo:</label>
+            <input type="text" id="regName" required placeholder="Juan Pérez">
+          </div>
+          <div class="form-group">
+            <label for="regEmail">Correo Electrónico:</label>
+            <input type="email" id="regEmail" required placeholder="usuario@ejemplo.com">
+          </div>
+          <div class="form-group">
+            <label for="regPet">Tipo de Mascota Preferida:</label>
+            <select id="regPet" style="padding: 0.6rem; border: 1px solid #cbd5e0; border-radius: 6px;">
+              <option value="Perro">🐶 Perro</option>
+              <option value="Gato">🐱 Gato</option>
+              <option value="Ambos">🐶🐱 Ambos</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="regPassword">Contraseña:</label>
+            <input type="password" id="regPassword" required placeholder="••••••••">
+          </div>
+          <button type="submit" class="btn-filter active" style="width: 100%; padding: 0.8rem; font-size: 1rem; margin-bottom: 1rem;">Registrar Cuenta</button>
+        </form>
+        <p style="text-align: center; font-size: 0.85rem; color: #718096;">
+          ¿Ya tienes cuenta? <a href="#" onclick="showAccountSubView('login')" style="color: var(--primary); font-weight: bold;">Inicia sesión</a>
+        </p>
+      </div>
+
+      <div id="profileBox" class="form-box" style="max-width: 600px; display: none;">
+        <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1.5rem; border-bottom: 1px solid #e2e8f0; padding-bottom: 1rem;">
+          <div id="profileAvatar" style="width: 60px; height: 60px; border-radius: 50%; background: var(--secondary); color: white; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; font-weight: bold;">
+            JP
+          </div>
+          <div>
+            <h2 id="profileName" style="color: var(--primary); font-size: 1.3rem;">Juan Pérez</h2>
+            <p id="profileEmail" style="color: #718096; font-size: 0.9rem;">juan.perez@ejemplo.com</p>
+          </div>
+        </div>
+
+        <h3 style="margin-bottom: 0.8rem; color: var(--text);">Resumen de Progreso</h3>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1.5rem;">
+          <div style="background: #f1f5f9; padding: 1rem; border-radius: 8px; text-align: center;">
+            <span id="profilePoints" style="font-size: 1.2rem; font-weight: bold; color: var(--primary);">⭐ 0 pts</span>
+            <p style="font-size: 0.85rem; color: #4a5568;">Puntaje Minijuegos</p>
+          </div>
+          <div style="background: #f1f5f9; padding: 1rem; border-radius: 8px; text-align: center;">
+            <span id="profilePet" style="font-size: 1.2rem; font-weight: bold; color: var(--primary);">🐶 Perros</span>
+            <p style="font-size: 0.85rem; color: #4a5568;">Mascota Preferida</p>
+          </div>
+        </div>
+
+        <h3 style="margin-bottom: 0.8rem; color: var(--text);">Fichas Consultadas / Favoritas</h3>
+        <ul id="savedCardsList" style="list-style: none; margin-bottom: 1.5rem;">
+          <li style="padding: 0.5rem; border-bottom: 1px solid #edf2f7; font-size: 0.9rem;">📌 Esquema de Vacunación Canina</li>
+        </ul>
+
+        <button class="btn-filter" style="width: 100%; border-color: #e53e3e; color: #e53e3e;" onclick="handleLogout()">Cerrar Sesión</button>
+      </div>
+
+    </section>
+  </main>
+
+  <div id="detailModal" class="modal-overlay" onclick="closeModal(event)">
+    <div class="modal-content" onclick="event.stopPropagation()">
+      <button class="modal-close" onclick="closeModal()">&times;</button>
+      <div id="modalBody"></div>
+    </div>
+  </div>
+
+  <footer>
+    <p>PetThinks &copy; Prototipo e Interfaz Final de Usuario</p>
+  </footer>
+
+  <script src="js/app.js"></script>
+</body>
+</html>
